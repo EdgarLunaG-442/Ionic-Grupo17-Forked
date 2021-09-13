@@ -1,6 +1,7 @@
 from flask import request,jsonify
 from marshmallow.exceptions import ValidationError
 import redis
+import os
 from datetime import timedelta
 from ..modelos import db, Cancion, CancionSchema, Usuario, UsuarioSchema, Album, AlbumSchema, Medio
 from flask_restful import Resource
@@ -14,7 +15,10 @@ usuario_schema = UsuarioSchema()
 album_schema = AlbumSchema()
 
 jwt_redis_blocklist = redis.StrictRedis(
-    host="localhost", port=6379, db=0, decode_responses=True
+    host=os.environ.get('REDIS_HOST'),
+    port=os.environ.get('REDIS_PORT'),
+    db=0, decode_responses=True,
+    password=os.environ.get('REDIS_PASSWORD')
 )
 
 @jwt.token_in_blocklist_loader
