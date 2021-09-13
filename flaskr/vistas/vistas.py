@@ -1,6 +1,7 @@
 from flask import request,jsonify
 from marshmallow.exceptions import ValidationError
-# import redis
+import redis
+from urllib.parse import urlparse
 import os
 from datetime import timedelta
 from ..modelos import db, Cancion, CancionSchema, Usuario, UsuarioSchema, Album, AlbumSchema, Medio
@@ -14,19 +15,14 @@ cancion_schema = CancionSchema()
 usuario_schema = UsuarioSchema()
 album_schema = AlbumSchema()
 
-# jwt_redis_blocklist = redis.StrictRedis(
-#     host=os.environ.get('REDIS_HOST'),
-#     port=os.environ.get('REDIS_PORT'),
-#     db=0, 
-#     decode_responses=True,
-#     password=os.environ.get('REDIS_PASSWORD')
-# )
+url = urlparse(os.environ.get("REDIS_URL"))
+jwt_redis_blocklist = redis.Redis(host=url.hostname, port=url.port, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
 
-# @jwt.token_in_blocklist_loader
-# def check_if_token_is_revoked(jwt_header, jwt_payload):
-#     jti = jwt_payload["jti"]
-#     token_in_redis = jwt_redis_blocklist.get(jti)
-#     return token_in_redis is not None
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    token_in_redis = jwt_redis_blocklist.get(jti)
+    return token_in_redis is not None
 
 def withoutPass(usuario):
     contrasena,rest = (lambda contrasena, **rest: (contrasena, rest))(**usuario)
