@@ -130,6 +130,7 @@ class VistaLogIn(Resource):
 
     def post(self):
         try:
+            print(os.environ.get('REDIS_HOST'))
             usuario = Usuario.query.filter(Usuario.nombre == request.json["nombre"]).first()
             if usuario is None:
                 return {"mensaje":"El usuario no existe"}, 404
