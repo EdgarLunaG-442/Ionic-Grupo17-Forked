@@ -21,4 +21,4 @@ SQLAlchemy==1.4.15
 Werkzeug==2.0.1
 redis
 Faker==8.13.2
-gunicorn==20.1.0
+gunicorn
